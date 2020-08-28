@@ -40,7 +40,28 @@ public class WordUtil {
     }
 
     /**
+    　* @description 创建xsd文件数据的docx文档
+      * 该方法只处理文件名为xs----.xsd或xs----a.xsd的文件
+      *@param: [xsdFileDocument xsd文件夹, resultFile 结果文件]
+    　* @return: void
+    　* @author: fuoo
+    　* @date: 2020/8/28 10:36
+    　*/
+    public static void createXsdDataDocx(String xsdFileDocument, String resultFile) throws Exception{
+        File xsdFileDocumentFile = new File(xsdFileDocument);
+        List<File> xsdFileList = Arrays.asList(xsdFileDocumentFile.listFiles());
+        for (File file:xsdFileList) {
+            String fileName = file.getName();
+            if (!fileName.matches("xs[0-9]{4}(a.xsd|.xsd)")) {
+                xsdFileList.remove(file);
+            }
+        }
+        createXsdDataDocx(xsdFileList, resultFile);
+    }
+
+    /**
     　* @description: 创建xsd文件数据的docx文档
+      *该方法只处理文件名为xs----.xsd或xs----a.xsd的文件
     　* @param: [xsdFileDocument xsd文件夹, resultFile 结果文件, implNames接口名称]
     　* @return: void
     　* @author: fuoo
@@ -48,6 +69,10 @@ public class WordUtil {
     　*/
     public static void createXsdDataDocx(String xsdFileDocument, String resultFile, String[] implNames) throws Exception{
         List<File> xsdFileList = WordUtil.readXsdFile(xsdFileDocument, implNames);
+        createXsdDataDocx(xsdFileList, resultFile);
+    }
+
+    private static void createXsdDataDocx(List<File> xsdFileList, String resultFile) throws Exception{
         for (File file:xsdFileList) {
             if (file.getName().contains(WordUtil.FILE_SUFFIX_2)) {
                 // 请响应文件
@@ -65,6 +90,7 @@ public class WordUtil {
                 String fileName = WordUtil.createFileName(file, XMLConstants.REQUEST_DETAIL);
                 WordUtil.createWordTable(fileName, xsdNodeList);
             }
+            System.out.println(file + "生成表格成功！");
         }
 
         // 文件合并
@@ -196,7 +222,7 @@ public class WordUtil {
 
             if (!"int".equals(node.getType())) {
                 char[] str = node.getType().toCharArray();
-                if (str[0] >= 'a' && str[0] <= 'z') {
+                if (str.length >= 1 && str[0] >= 'a' && str[0] <= 'z') {
                     str[0] -= 32;
                 }
                 node.setType(new String(str));
@@ -240,8 +266,12 @@ public class WordUtil {
             }
         }
 
+        if (fileList.size() == 0) {
+            throw new RuntimeException("一个对应的文件都未找到");
+        }
+
         if (notFoundList.size() > 0) {
-            System.out.println("未找打文件：");
+            System.out.println("未找到文件：");
             for (File file:notFoundList) {
                 System.out.println(file.getPath());
             }

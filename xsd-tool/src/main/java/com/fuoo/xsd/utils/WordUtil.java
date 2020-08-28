@@ -32,6 +32,8 @@ public class WordUtil {
     public final static String DOCX_SUFFIX = ".docx";
     // 临时文件地址
     public final static File FILE_WORD_DOCUMENT = new File("D:\\xsd_tool");
+    // 处理文件计数
+    public static int index = 0;
 
     static {
         if (!FILE_WORD_DOCUMENT.exists()) {
@@ -77,18 +79,21 @@ public class WordUtil {
             if (file.getName().contains(WordUtil.FILE_SUFFIX_2)) {
                 // 请响应文件
                 List<XSDNode> xsdNodeList = ParseXsdUtil.paserXSD(file, XMLConstants.PAGE_INFO);
-                String fileName = WordUtil.createFileName(file, XMLConstants.PAGE_INFO);
+                String fileName = WordUtil.createFileName(file, XMLConstants.PAGE_INFO, index);
                 WordUtil.createWordTable(fileName, xsdNodeList);
+                index++;
 
                 // accessoryContents的XML数据内容
                 xsdNodeList = ParseXsdUtil.paserXSD(file, XMLConstants.ACCESSORY_CONTENTS_TYPE);
-                fileName =  WordUtil.createFileName(file, XMLConstants.ACCESSORY_CONTENTS_TYPE);
+                fileName =  WordUtil.createFileName(file, XMLConstants.ACCESSORY_CONTENTS_TYPE, index);
                 WordUtil.createWordTable(fileName, xsdNodeList);
+                index++;
             } else {
                 // 请求体
                 List<XSDNode> xsdNodeList = ParseXsdUtil.paserXSD(file, XMLConstants.REQUEST_DETAIL);
-                String fileName = WordUtil.createFileName(file, XMLConstants.REQUEST_DETAIL);
+                String fileName = WordUtil.createFileName(file, XMLConstants.REQUEST_DETAIL, index);
                 WordUtil.createWordTable(fileName, xsdNodeList);
+                index++;
             }
             System.out.println(file + "生成表格成功！");
         }
@@ -119,7 +124,7 @@ public class WordUtil {
         Section sec = doc.addSection();
 
         //======================标题======================
-        String fileName =  new File(filePath).getName().replaceAll("0_|1_|2_|.docx", "");
+        String fileName =  new File(filePath).getName().replaceAll("[0-9]*_|.docx", "");
         String implName = fileName.replaceAll("[^0-9]", "");
         if (fileName.contains(XMLConstants.REQUEST_DETAIL)) {
             Paragraph paragraph = sec.addParagraph();
@@ -286,22 +291,8 @@ public class WordUtil {
     　* @author: fuoo
     　* @date: 2020/8/27 15:22
     　*/
-    public static String createFileName(File sourceFile, String type) {
-        String str = "";
-        switch (type) {
-            case XMLConstants.REQUEST_DETAIL:
-                str = "0_";
-                break;
-            case XMLConstants.PAGE_INFO:
-                str = "1_";
-                break;
-            case XMLConstants.ACCESSORY_CONTENTS_TYPE:
-                str = "2_";
-                break;
-            default:
-                str = "";
-        }
-        return FILE_WORD_DOCUMENT.getPath() + File.separator + str + sourceFile.getName().replaceAll("[^0-9]", "") + type + WordUtil.DOCX_SUFFIX;
+    public static String createFileName(File sourceFile, String type,int index) {
+        return FILE_WORD_DOCUMENT.getPath() + File.separator + index + "_" + sourceFile.getName().replaceAll("[^0-9]", "") + type + WordUtil.DOCX_SUFFIX;
     }
 
     /**
@@ -312,6 +303,23 @@ public class WordUtil {
      　* @date: 2020/8/27 11:31
      　*/
     public static void mergeWordList(String saveFilePath, List<File> srcfile) throws Exception {
+        Collections.sort(srcfile);
+
+        Collections.sort(srcfile, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                int fileIndex1 = Integer.valueOf(o1.getName().replaceAll("[^0-9]", ""));
+                int fileIndex2 = Integer.valueOf(o2.getName().replaceAll("[^0-9]", ""));
+                if (fileIndex1 > fileIndex2) {
+                    return 1;
+                } else if (fileIndex1 < fileIndex2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
         File newFile = new File(saveFilePath);
         newFile.delete();
         OutputStream dest = new FileOutputStream(newFile);

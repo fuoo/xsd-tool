@@ -44,4 +44,11 @@
             <version>3.17</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>com.e-iceblue</id>
+            <url>http://repo.e-iceblue.cn/repository/maven-public/</url>
+        </repository>
+    </repositories>
 </project>

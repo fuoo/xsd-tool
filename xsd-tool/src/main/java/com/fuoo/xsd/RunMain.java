@@ -16,7 +16,7 @@ public class RunMain {
         // 接口数字名称 例如:（文件格式名xs---.xsd、xs---a.xsd）文件名为xs1101.xsd、xs1101a.xsd取1101
         String[] implNames = new String[] {"1101"};
         // 结果保存地址
-        String resultFile = "C:\\Users\\Administrator\\Desktop\\xsd\\word\\Test.docx";
+        String resultFile = "C:\\Users\\Administrator\\Desktop\\xsd\\word\\Tests.docx";
 
         try {
             System.out.println("创建表格文档......");

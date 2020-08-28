@@ -230,7 +230,11 @@ public class WordUtil {
                 if (str.length >= 1 && str[0] >= 'a' && str[0] <= 'z') {
                     str[0] -= 32;
                 }
+
                 node.setType(new String(str));
+                if ("PageContentsType".equals(node.getType()) || "AccessoryContentsType".equals(node.getType())) {
+                    node.setType("String");
+                }
             }
             data[i] = new String[]{node.getName(), node.getType(), node.getIsCanNull(), ""};
             i++;
